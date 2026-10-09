@@ -2,13 +2,13 @@
 
 The `ballerinax/cloudmersive.barcode` connector provides practical examples illustrating usage in various scenarios.
 
-[//]: # (TODO: Add examples)
-1. 
-2. 
+1. [product_label_generation](./product_label_generation/product_label_generation.md) - Look up a product by EAN and generate its barcode label image.
+2. [barcode_image_lookup](./barcode_image_lookup/barcode_image_lookup.md) - Read a barcode from an image and look up the matching product.
 
 ## Prerequisites
 
-[//]: # (TODO: Add prerequisites)
+1. A Cloudmersive API key, supplied through each example's `Config.toml`.
+2. Ballerina Swan Lake 2201.12.0 or later.
 
 ## Running an example
 

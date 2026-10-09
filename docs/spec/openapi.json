@@ -1,0 +1,872 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "v1",
+    "title": "barcodeapi",
+    "description": "Barcode APIs let you generate barcode images, and recognize values from images of barcodes."
+  },
+  "host": "api.cloudmersive.com",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/barcode/lookup/ean": {
+      "post": {
+        "tags": [
+          "BarcodeLookup"
+        ],
+        "summary": "Lookup EAN barcode value, return product data",
+        "description": "Lookup an input EAN barcode and return key details about the product",
+        "operationId": "BarcodeLookup_EanLookup",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "description": "Barcode value",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product data for the matched barcode",
+            "schema": {
+              "$ref": "#/definitions/BarcodeLookupResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/scan/image": {
+      "post": {
+        "tags": [
+          "BarcodeScan"
+        ],
+        "summary": "Scan and recognize an image of a barcode",
+        "description": "Scan an image or photo of a barcode and return the result.  Supported barcode types include AZTEC, CODABAR, CODE_39, CODE_93, CODE_128, DATA_MATRIX, EAN_8, EAN_13, ITF, MAXICODE, PDF_417, QR_CODE, RSS_14, RSS_EXPANDED, UPC_A, UPC_E, All_1D, UPC_EAN_EXTENSION, MSI, PLESSEY, IMB",
+        "operationId": "BarcodeScan_Image",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "imageFile",
+            "in": "formData",
+            "description": "Image file to perform the operation on.  Common file formats such as PNG, JPEG are supported.",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recognized value and type of the barcode in the image",
+            "schema": {
+              "$ref": "#/definitions/BarcodeScanResult"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/scan/image/advanced": {
+      "post": {
+        "tags": [
+          "BarcodeScan"
+        ],
+        "summary": "Advanced AI scan and recognition of an image of one or more barcodes of any type",
+        "description": "Scan an image or photo of a barcode and return the result with enhanced accuracy, particularlly for low quality inputs using Advanced AI.  Supported barcode types include AZTEC, CODABAR, CODE_39, CODE_93, CODE_128, DATA_MATRIX, EAN_8, EAN_13, ITF, MAXICODE, PDF_417, QR_CODE, RSS_14, RSS_EXPANDED, UPC_A, UPC_E, All_1D, UPC_EAN_EXTENSION, MSI, PLESSEY, IMB.  Uses large model AI.  Consumes 100 API calls per image page.  For Managed Instance and Private Cloud requires GPU infrastructure.  Supports PNG, PDF and JPEG input file formats.",
+        "operationId": "BarcodeScan_ImageAdvanced",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "imageFile",
+            "in": "formData",
+            "description": "Image file to perform the operation on.  Common file formats such as PNG, JPEG are supported.",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recognized barcodes found in the image",
+            "schema": {
+              "$ref": "#/definitions/BarcodeAdvancedScanResult"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/scan/image/advanced/qr": {
+      "post": {
+        "tags": [
+          "BarcodeScan"
+        ],
+        "summary": "Advanced AI scan and recognition of an image of one or more QR barcodes",
+        "description": "Scan an image or photo of a QR barcode and return the result.  Uses AI deep learning to read blurry or low resultion QR barcodes.  Supports PNG, PDF and JPEG input file formats.",
+        "operationId": "BarcodeScan_ImageAdvancedQR",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "imageFile",
+            "in": "formData",
+            "description": "Image file to perform the operation on.  Common file formats such as PNG, JPEG are supported.",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "preprocessing",
+            "in": "header",
+            "description": "Optional, preprocessing mode, default is 'Auto'.  Possible values are None (no preprocessing of the image), SmoothEdges, SmoothEdgesPlus, and Auto (automatic image enhancement of the image - including automatic unrotation of the image - before OCR is applied; this is recommended).  Set this to 'None' if you do not want to use automatic image unrotation and enhancement.  Set to SmoothEdges to smooth harsh edges in the input image to enhance recognition accuracy.  Set to SmoothEdgesPlus to smooth harsh edges to a higher degree.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "recognitionMode",
+            "in": "header",
+            "description": "Optional, recognitionMode mode, default is 'Advanced'.  Possible values are Advanced, and Advanced2 which provides the most advanced available barcode recognition.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recognized QR barcodes found in the image",
+            "schema": {
+              "$ref": "#/definitions/BarcodeScanQRAdvancedResult"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/batch-job/scan/image/advanced/qr": {
+      "post": {
+        "tags": [
+          "BatchJob"
+        ],
+        "summary": "Advanced AI scan and recognition of an image of one or more QR barcodes as a Batch Job",
+        "description": "Creates an async batch job to scan an image or photo of a QR barcode and return the result.  Uses AI deep learning to read blurry or low resultion QR barcodes.  Supports PNG, PDF and JPEG input file formats.  Use the GetAsyncJobStatus API to check on the status of this job using the returned AsyncJobID and get the result when it finishes.  Requires Managed Instance or Private Cloud deployment.",
+        "operationId": "BatchJob_ScanImageAdvancedQRBatchJob",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "imageFile",
+            "in": "formData",
+            "description": "Image file to perform the operation on.  Common file formats such as PNG, JPEG are supported.",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "preprocessing",
+            "in": "header",
+            "description": "Optional, preprocessing mode, default is 'Auto'.  Possible values are None (no preprocessing of the image), SmoothEdges, SmoothEdgesPlus, and Auto (automatic image enhancement of the image - including automatic unrotation of the image - before OCR is applied; this is recommended).  Set this to 'None' if you do not want to use automatic image unrotation and enhancement.  Set to SmoothEdges to smooth harsh edges in the input image to enhance recognition accuracy.  Set to SmoothEdgesPlus to smooth harsh edges to a higher degree.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "recognitionMode",
+            "in": "header",
+            "description": "Optional, recognitionMode mode, default is 'Advanced'.  Possible values are Advanced, and Advanced2 which provides the most advanced available barcode recognition.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Identifier of the created barcode batch job",
+            "schema": {
+              "$ref": "#/definitions/BarcodeBatchJobResult"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/batch-job/status": {
+      "get": {
+        "tags": [
+          "BatchJob"
+        ],
+        "summary": "Get the status and result of a Barcode Batch Job",
+        "description": "Returns the result of the Async Job - possible states can be STARTED or COMPLETED.  This API is only available for Cloudmersive Managed Instance and Private Cloud deployments.",
+        "operationId": "BatchJob_GetAsyncJobStatus",
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "AsyncJobID",
+            "in": "query",
+            "description": "Job ID for the batch job to get the status of",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status and, once completed, result of the barcode batch job",
+            "schema": {
+              "$ref": "#/definitions/BarcodeBatchJobStatusResult"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/generate/qrcode": {
+      "post": {
+        "tags": [
+          "GenerateBarcode"
+        ],
+        "summary": "Generate a QR code barcode as PNG file",
+        "description": "Generate a QR code barcode as a PNG file, a type of 2D barcode which can encode free-form text information",
+        "operationId": "GenerateBarcode_QRCode",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "description": "QR code text to convert into the QR code barcode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "width",
+            "in": "header",
+            "description": "Optional: width of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "height",
+            "in": "header",
+            "description": "Optional: height of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG image of the generated QR code",
+            "schema": {
+              "format": "byte",
+              "title": "OutputContent",
+              "description": "Output file content from the operation",
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/generate/upc-a": {
+      "post": {
+        "tags": [
+          "GenerateBarcode"
+        ],
+        "summary": "Generate a UPC-A code barcode as PNG file",
+        "description": "Validate and generate a UPC-A barcode as a PNG file, a type of 1D barcode",
+        "operationId": "GenerateBarcode_UPCA",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "description": "UPC-A barcode value to generate from",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "width",
+            "in": "header",
+            "description": "Optional: width of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "height",
+            "in": "header",
+            "description": "Optional: height of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "includeLabel",
+            "in": "header",
+            "description": "Optional: show text label on the image of the barcode value, default is true.",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG image of the generated UPC-A barcode",
+            "schema": {
+              "format": "byte",
+              "title": "OutputContent",
+              "description": "Output file content from the operation",
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/generate/upc-e": {
+      "post": {
+        "tags": [
+          "GenerateBarcode"
+        ],
+        "summary": "Generate a UPC-E code barcode as PNG file",
+        "description": "Validates and generate a UPC-E barcode as a PNG file, a type of 1D barcode",
+        "operationId": "GenerateBarcode_UPCE",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "description": "UPC-E barcode value to generate from",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "width",
+            "in": "header",
+            "description": "Optional: width of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "height",
+            "in": "header",
+            "description": "Optional: height of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "includeLabel",
+            "in": "header",
+            "description": "Optional: show text label on the image of the barcode value, default is true.",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG image of the generated UPC-E barcode",
+            "schema": {
+              "format": "byte",
+              "title": "OutputContent",
+              "description": "Output file content from the operation",
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/generate/ean-13": {
+      "post": {
+        "tags": [
+          "GenerateBarcode"
+        ],
+        "summary": "Generate a EAN-13 code barcode as PNG file",
+        "description": "Validates and generate a EAN-13 barcode as a PNG file, a type of 1D barcode",
+        "operationId": "GenerateBarcode_EAN13",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "description": "Barcode value to generate from",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "width",
+            "in": "header",
+            "description": "Optional: width of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "height",
+            "in": "header",
+            "description": "Optional: height of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "includeLabel",
+            "in": "header",
+            "description": "Optional: show text label on the image of the barcode value, default is true.",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG image of the generated EAN-13 barcode",
+            "schema": {
+              "format": "byte",
+              "title": "OutputContent",
+              "description": "Output file content from the operation",
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/generate/ean-8": {
+      "post": {
+        "tags": [
+          "GenerateBarcode"
+        ],
+        "summary": "Generate a EAN-8 code barcode as PNG file",
+        "description": "Validates and generate a EAN-8 barcode as a PNG file, a type of 1D barcode",
+        "operationId": "GenerateBarcode_EAN8",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "description": "Barcode value to generate from",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "width",
+            "in": "header",
+            "description": "Optional: width of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "height",
+            "in": "header",
+            "description": "Optional: height of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "includeLabel",
+            "in": "header",
+            "description": "Optional: show text label on the image of the barcode value, default is true.",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG image of the generated EAN-8 barcode",
+            "schema": {
+              "format": "byte",
+              "title": "OutputContent",
+              "description": "Output file content from the operation",
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    },
+    "/barcode/generate/code-128": {
+      "post": {
+        "tags": [
+          "GenerateBarcode"
+        ],
+        "summary": "Generate a Code 128 barcode as PNG file",
+        "description": "Validates and generate a Code 128 barcode as a PNG file, a type of 1D barcode",
+        "operationId": "GenerateBarcode_Code128",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "description": "Barcode value to generate from",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "width",
+            "in": "header",
+            "description": "Optional: width of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "height",
+            "in": "header",
+            "description": "Optional: height of the barcode in pixels.  Minimum value of 10.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "includeLabel",
+            "in": "header",
+            "description": "Optional: show text label on the image of the barcode value, default is true.",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG image of the generated Code 128 barcode",
+            "schema": {
+              "format": "byte",
+              "title": "OutputContent",
+              "description": "Output file content from the operation",
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "Apikey": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "BarcodeLookupResponse": {
+      "description": "Result of performing a barcode lookup",
+      "type": "object",
+      "properties": {
+        "Successful": {
+          "description": "True if operation was successful, false otherwise",
+          "type": "boolean"
+        },
+        "Matches": {
+          "description": "Resulting product matches for the input barcode",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProductMatch"
+          }
+        }
+      }
+    },
+    "ProductMatch": {
+      "description": "Matching product for the input barcode",
+      "type": "object",
+      "properties": {
+        "EAN": {
+          "description": "EAN code for the product",
+          "type": "string"
+        },
+        "Title": {
+          "description": "Title of the product",
+          "type": "string"
+        }
+      }
+    },
+    "BarcodeScanResult": {
+      "description": "Result of the barcode scan",
+      "type": "object",
+      "properties": {
+        "Successful": {
+          "description": "True if the operation was successful, false otherwise",
+          "type": "boolean"
+        },
+        "BarcodeType": {
+          "description": "The type of the barcode; possible values are AZTEC, CODABAR, CODE_39, CODE_93, CODE_128, DATA_MATRIX, EAN_8, EAN_13, ITF, MAXICODE, PDF_417, QR_CODE, RSS_14, RSS_EXPANDED, UPC_A, UPC_E, All_1D, UPC_EAN_EXTENSION, MSI, PLESSEY, IMB",
+          "type": "string"
+        },
+        "RawText": {
+          "description": "The barcode text",
+          "type": "string"
+        }
+      }
+    },
+    "BarcodeAdvancedScanResult": {
+      "description": "Result of the advanced barcode scan",
+      "type": "object",
+      "properties": {
+        "Successful": {
+          "description": "True if the operation was successful, false otherwise",
+          "type": "boolean"
+        },
+        "ResultBarcodes": {
+          "description": "Results of performing the barcode scan operation",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BarcodeAdvancedResultItem"
+          }
+        },
+        "BarcodeCount": {
+          "format": "int32",
+          "description": "Number of barcodes read",
+          "type": "integer"
+        },
+        "ErrorMessage": {
+          "description": "Error message if any",
+          "type": "string"
+        }
+      }
+    },
+    "BarcodeAdvancedResultItem": {
+      "description": "Advanced barcode scan result instance",
+      "type": "object",
+      "properties": {
+        "RawText": {
+          "description": "The barcode text",
+          "type": "string"
+        },
+        "BarcodeType": {
+          "description": "Type of the barcode; supported barcode types include AZTEC, CODABAR, CODE_39, CODE_93, CODE_128, DATA_MATRIX, EAN_8, EAN_13, ITF, MAXICODE, PDF_417, QR_CODE, RSS_14, RSS_EXPANDED, UPC_A, UPC_E, All_1D, UPC_EAN_EXTENSION, MSI, PLESSEY, IMB.",
+          "type": "string"
+        }
+      }
+    },
+    "BarcodeScanQRAdvancedResult": {
+      "description": "Result of the advanced QR barcode scan",
+      "type": "object",
+      "properties": {
+        "Successful": {
+          "description": "True if the operation was successful, false otherwise",
+          "type": "boolean"
+        },
+        "ResultBarcodes": {
+          "description": "Results of performing the QR barcode scan operation",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BarcodeQRResultItem"
+          }
+        },
+        "BarcodeCount": {
+          "format": "int32",
+          "description": "Number of barcodes read",
+          "type": "integer"
+        },
+        "ErrorMessage": {
+          "description": "Error message if any",
+          "type": "string"
+        }
+      }
+    },
+    "BarcodeQRResultItem": {
+      "description": "QR barcode instance",
+      "type": "object",
+      "properties": {
+        "RawText": {
+          "description": "The barcode text",
+          "type": "string"
+        }
+      }
+    },
+    "BarcodeBatchJobResult": {
+      "description": "Result of creating a barcode batch job",
+      "type": "object",
+      "properties": {
+        "Successful": {
+          "description": "True if successful, false otherwise",
+          "type": "boolean"
+        },
+        "AsyncJobID": {
+          "description": "When creating a job, an Async Job ID is returned.  Use the GetAsyncJobStatus API to check on the status of this job using the AsyncJobID and get the result when it finishes",
+          "type": "string"
+        }
+      }
+    },
+    "BarcodeBatchJobStatusResult": {
+      "description": "Result of checking on the status of a barcode batch job",
+      "type": "object",
+      "properties": {
+        "Successful": {
+          "description": "True if the operation to check the status of the job was successful, false otherwise",
+          "type": "boolean"
+        },
+        "AsyncJobStatus": {
+          "description": "Returns the job status of the Async Job, if applicable.  Possible states are STARTED and COMPLETED",
+          "type": "string"
+        },
+        "AsyncJobID": {
+          "description": "Job ID",
+          "type": "string"
+        },
+        "QRScanResult": {
+          "$ref": "#/definitions/BarcodeScanQRAdvancedResult",
+          "description": "Result of performing an Advanced QR barcode scan operation on the input image"
+        },
+        "ErrorMessage": {
+          "description": "Error message (if any)",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "Apikey": []
+    }
+  ],
+  "securityDefinitions": {
+    "Apikey": {
+      "type": "apiKey",
+      "description": "API Key Authentication",
+      "name": "Apikey",
+      "in": "header"
+    }
+  }
+}
